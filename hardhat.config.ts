@@ -17,7 +17,7 @@ const argv = yargs
 
 // Load environment variables.
 dotenv.config();
-const { NODE_URL, INFURA_KEY, MNEMONIC, ETHERSCAN_API_KEY, PK, SOLIDITY_VERSION, SOLIDITY_SETTINGS, CUSTOM_DETERMINISTIC_DEPLOYMENT } = process.env;
+const { NODE_URL, INFURA_KEY, MNEMONIC, PRIVATE_KEY, ETHERSCAN_API_KEY, PK, SOLIDITY_VERSION, SOLIDITY_SETTINGS, CUSTOM_DETERMINISTIC_DEPLOYMENT } = process.env;
 
 const DEFAULT_MNEMONIC =
   "candy maple cake sugar pudding cream honey rich smooth crumble sweet treat";
@@ -26,9 +26,17 @@ const sharedNetworkConfig: HttpNetworkUserConfig = {};
 if (PK) {
   sharedNetworkConfig.accounts = [PK];
 } else {
-  sharedNetworkConfig.accounts = {
-    mnemonic: MNEMONIC || DEFAULT_MNEMONIC,
-  };
+  sharedNetworkConfig.accounts = (MNEMONIC && MNEMONIC !== "")
+  ? 
+    {
+      mnemonic: MNEMONIC,
+    }
+  : (PRIVATE_KEY && PRIVATE_KEY !== "")
+    ?
+      [PRIVATE_KEY]
+    : {
+      mnemonic: DEFAULT_MNEMONIC,
+    };
 }
 
 if (["mainnet", "rinkeby", "kovan", "goerli", "ropsten", "mumbai", "polygon"].includes(argv.network) && INFURA_KEY === undefined) {
